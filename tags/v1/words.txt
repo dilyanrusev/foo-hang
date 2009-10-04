@@ -1,0 +1,15 @@
+keyhole : lock
+application : program
+itercept : stop, catch
+founding : created, town
+spot : point
+poor : not rich
+negligent : absent-minded
+wonder : miracle
+ginger : plant
+mountain : opposite to plain
+water : not fire
+ice : cold water
+doctor : physician
+layer : slice
+malaria : sickness
