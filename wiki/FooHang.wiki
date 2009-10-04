@@ -1,0 +1,7 @@
+#summary Foo-hang: a simple hangman clone
+
+= Foo hang =
+
+Foo-hang is written using:
+  * Python *3.1*
+  * Pygame 1.9
