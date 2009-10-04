@@ -30,7 +30,7 @@ def showWindow():
     "Show and initialize the Pygame window"
     pygame.init()
     screen = pygame.display.set_mode((640, 480))
-    pygame.display.set_caption("Foo-Hang")
+    pygame.display.set_caption("Foo-Hang (Press Esc to quit)")
     return screen
 
 def loadFont():
@@ -71,12 +71,21 @@ def runLoop(screen):
     "Run the main game loop"
     words = loadWords()
     loadFont()
+    
+    images = []
+    for i in range(1,6):
+        img = pygame.image.load("hang_{0}.png".format(i))
+        img = img.convert()
+        images.append(img)
+
+    
     currentWord, guessedWord = getRandomWord(words)
     
     pressedKeys = []
     wrong = 0
     maxWrong = 5
     win = False
+    lose = False
     
     done = False
     while not done:
@@ -86,13 +95,15 @@ def runLoop(screen):
             if event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
                     done = True
-                elif event.key == K_SPACE:
+                elif (win or lose) and event.key == K_SPACE:
                     currentWord, guessedWord = getRandomWord(words)
                     pressedKeys = []
                     wrong = 0
+                    win = False
+                    lose = False
                 
                 keyName = pygame.key.name(event.key)
-                if len(keyName) == 1 and not contains(pressedKeys, keyName):
+                if not lose and len(keyName) == 1 and not contains(pressedKeys, keyName):
                     pressedKeys.append(keyName)
                     
                     if contains(currentWord, keyName):
@@ -100,24 +111,38 @@ def runLoop(screen):
                         if same(currentWord, guessedWord):
                             win = True
                     else:
-                        wrong += 1                
+                        if wrong < maxWrong:
+                            wrong += 1
+                            
+                        if wrong == maxWrong:
+                            lose = True                    
                     
         if not done:
             screen.fill((0,0,0))
             
             offset = 20
             lineHeight = font.get_height() + 10
-            drawText(screen, offset, offset, currentWord)
-            drawText(screen, offset, offset + lineHeight, guessedWord)
-            if not win:
-                drawText(screen, offset, offset + lineHeight * 3, "Pressed symbols:")
-                drawText(screen, offset, offset + lineHeight * 4, ", ".join(pressedKeys))
-                drawText(screen, offset, offset + lineHeight * 5, "Wrong: {0} out of {1}".format(wrong, maxWrong))
+
+            if not lose:
+                drawText(screen, offset, offset, guessedWord)
             else:
-                drawText(screen, offset, offset + lineHeight * 3, "You have won!")
-                drawText(screen, offset, offset + lineHeight * 4, "Press space for the next word")
+                drawText(screen, offset, offset, currentWord)
+                
+            if not win and not lose:
+                drawText(screen, offset, offset + lineHeight * 2, "Pressed symbols:")
+                drawText(screen, offset, offset + lineHeight * 3, ", ".join(pressedKeys))
+                drawText(screen, offset, offset + lineHeight * 4, "Wrong: {0} out of {1}".format(wrong, maxWrong))
+            else:
+                if win:
+                    drawText(screen, offset, offset + lineHeight * 2, "You have won!")
+                elif lose:                    
+                    drawText(screen, offset, offset + lineHeight * 2, "You have lost!")
+                drawText(screen, offset, offset + lineHeight * 3, "Press space for the next word")
+                
             
-            
+            if wrong > 0 and wrong <= maxWrong:
+                screen.blit(images[wrong - 1], (offset , offset + lineHeight * 5))
+                
             pygame.display.flip()
 
 
